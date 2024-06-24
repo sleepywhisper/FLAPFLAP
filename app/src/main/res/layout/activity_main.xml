@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MainActivity">
+
+    <!-- 包含通用导航栏 -->
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/view_toolbar" />
+
+    <!-- HOME 标志 -->
+    <TextView
+        android:id="@+id/home_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:text="HOME"
+        android:textSize="24sp" />
+
+    <!-- 轮播图片广告 -->
+    <ViewFlipper
+        android:id="@+id/view_flipper"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/home_text"
+        android:layout_marginTop="20dp"
+        android:autoStart="true"
+        android:flipInterval="3000">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/sample_ad1"
+            android:scaleType="centerCrop" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/sample_ad2"
+            android:scaleType="centerCrop" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/sample_ad3"
+            android:scaleType="centerCrop" />
+    </ViewFlipper>
+
+    <!-- 推荐游戏列表 -->
+
+    <!-- 底部 More 按钮 -->
+
+    <TextView
+        android:id="@+id/rec_text"
+        android:layout_width="149dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view_flipper"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="152dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginEnd="110dp"
+        android:text="-今日推荐-"
+        android:textSize="24sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rec_text"
+        android:layout_marginTop="20dp"
+        android:padding="16dp"
+        tools:listitem="@layout/item_game" />
+
+    <Button
+        android:id="@+id/more_button"
+        android:layout_width="107dp"
+        android:layout_height="48dp"
+        android:layout_below="@id/recycler_view"
+        android:layout_marginStart="152dp"
+        android:layout_marginEnd="152dp"
+        android:layout_marginBottom="46dp"
+        android:text="More..." />
+</RelativeLayout>

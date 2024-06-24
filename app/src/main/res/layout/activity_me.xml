@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MeActivity"
+    android:fitsSystemWindows="true"
+    >
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/view_toolbar" />
+    </RelativeLayout>
+
+        <!-- TODO: Update blank fragment layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageButton
+                android:id="@+id/back_button"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:src="@android:drawable/ic_menu_revert" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="我"
+                android:textSize="35dp"
+                android:textColor="@color/green"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="的"
+                android:textSize="35dp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/edge"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:elevation="1dp">
+
+        <ImageView
+            android:id="@+id/me_avatar"
+            android:layout_width="127dp"
+            android:layout_height="127dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="8dp"
+            android:src="@drawable/default_avatar"
+            android:scaleType="centerCrop"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/me_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="用户名"
+                android:textColor="@color/black"
+                android:textSize="25dp"></TextView>
+
+            <TextView
+                android:id="@+id/me_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:text="id:123456"
+                android:textSize="12dp"></TextView>
+
+            <TextView
+                android:id="@+id/me_sign"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="我是个性签名呀。"
+                android:textColor="@color/black"
+                android:layout_marginTop="3dp"
+                android:textSize="14dp"></TextView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="7dp"
+                android:layout_gravity="bottom">
+
+                <TextView
+                    android:id="@+id/mydetails"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:text="个人中心>"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.761"
+                    android:clickable="true"></TextView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:layout_margin="10dp">
+
+            <include
+                android:id="@+id/mygame"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                layout="@layout/setting_item"
+                android:clickable="true"/>
+
+            <include
+                android:id="@+id/mydown"
+                android:layout_width="match_parent"
+                layout="@layout/setting_item"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:clickable="true"/>
+
+            <include
+                android:id="@+id/mysub"
+                android:layout_width="match_parent"
+                layout="@layout/setting_item"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:clickable="true"/>
+
+            <include
+                android:id="@+id/myalarm"
+                android:layout_width="match_parent"
+                layout="@layout/setting_item"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:clickable="true"/>
+
+        </LinearLayout>
+
+
+</LinearLayout>

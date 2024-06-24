@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".GameDetails"
+    android:fitsSystemWindows="true">
+
+    <RelativeLayout
+        android:id="@+id/tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/view_toolbar" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="10dp">
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_revert" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="游戏"
+            android:textSize="27dp"
+            android:textColor="@color/green"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="详情"
+            android:textSize="27dp"
+            android:textColor="@color/black"/>
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="127dp"
+            android:layout_height="127dp"
+            android:id="@+id/gameIcon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/icon1"
+            android:scaleType="centerCrop"
+            android:layout_marginLeft="24dp"
+            >
+        </ImageView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="骶婺芢骼"
+            android:id="@+id/gameName"
+            app:layout_constraintStart_toEndOf="@+id/gameIcon"
+            app:layout_constraintTop_toTopOf="@id/gameIcon"
+            android:layout_marginLeft="21dp"
+            android:textSize="24dp"
+            android:textColor="@color/black"></TextView>
+
+        <TextView
+            android:id="@+id/gameSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="1.94GB"
+            android:textSize="13dp"
+            app:layout_constraintStart_toStartOf="@id/gameName"
+            app:layout_constraintTop_toBottomOf="@id/gameName"></TextView>
+
+        <TextView
+            android:id="@+id/gameVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:text="1.5.9"
+            android:textSize="13dp"
+            app:layout_constraintBaseline_toBaselineOf="@id/gameSize"
+            app:layout_constraintStart_toEndOf="@id/gameSize"
+            app:layout_constraintTop_toTopOf="@id/gameSize"></TextView>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:id="@+id/game_download"
+            android:background="@color/green"
+            android:text="下载"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="@id/gameName"
+            app:layout_constraintBottom_toBottomOf="@id/gameIcon"></Button>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:id="@+id/game_community"
+            android:background="@color/black"
+            android:text="社区"
+            android:textColor="@color/white"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintStart_toEndOf="@id/game_download"
+            app:layout_constraintBottom_toBottomOf="@id/gameIcon"></Button>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edge"
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="14dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="游戏"
+            android:textColor="@color/black"
+            android:id="@+id/youxi"
+            android:textSize="20dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+        </TextView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="简介"
+            android:textColor="@color/green"
+            android:textSize="20dp"
+            android:layout_marginTop="14dp"
+            app:layout_constraintBaseline_toBaselineOf="@id/youxi"
+            app:layout_constraintStart_toEndOf="@id/youxi"
+            app:layout_constraintTop_toTopOf="@id/youxi">
+        </TextView>
+
+        <com.ms.square.android.expandabletextview.ExpandableTextView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/gameProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            expandableTextView:maxCollapsedLines="3"
+            expandableTextView:animDuration="200"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toStartOf="@id/youxi"
+            app:layout_constraintTop_toBottomOf="@id/youxi"
+            >
+
+            <TextView
+                android:id="@id/expandable_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:textSize="16sp"
+                android:textColor="#666666" />
+            <ImageButton
+                android:id="@id/expand_collapse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_gravity="right|bottom"
+                android:background="@android:color/transparent"/>
+        </com.ms.square.android.expandabletextview.ExpandableTextView>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="游戏"
+            android:textColor="@color/black"
+            android:layout_marginTop="14dp"
+            android:id="@+id/tupian"
+            android:textSize="20dp"
+            app:layout_constraintStart_toStartOf="@id/youxi"
+            app:layout_constraintTop_toBottomOf="@id/gameProfile">
+        </TextView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="图片"
+            android:textColor="@color/green"
+            android:textSize="20dp"
+            app:layout_constraintBaseline_toBaselineOf="@id/tupian"
+            app:layout_constraintStart_toEndOf="@id/tupian"
+            app:layout_constraintTop_toTopOf="@id/tupian">
+        </TextView>
+
+        <com.youth.banner.Banner
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:id="@+id/gbanner"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toStartOf="@id/tupian"
+            app:layout_constraintTop_toBottomOf="@id/tupian">
+        </com.youth.banner.Banner>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

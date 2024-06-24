@@ -1,0 +1,89 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/view_toolbar" />
+
+    <!-- 第一行：左边是返回键，旁边是“编辑”标题，下方是社区名，最右边是发布按钮 -->
+
+    <!-- 帖子编辑框 -->
+
+    <!-- 底部功能图标 -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="52dp"
+            android:layout_height="54dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="back"
+            android:src="@android:drawable/ic_menu_revert" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="编辑"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="8sp"
+            android:text="社区名"
+            android:textColor="#888888"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btn_publish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发布" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/edit_text_post"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="10sp"
+        android:hint="请在此输入帖子内容…"
+        android:gravity="top|left" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/insert_picture_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/insert_picture_icon" />
+
+        <ImageView
+            android:id="@+id/at_friends_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="24dp"
+            android:src="@drawable/arroba" />
+
+        <ImageView
+            android:id="@+id/select_topic_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="24dp"
+            android:src="@drawable/hash" />
+
+    </LinearLayout>
+
+</LinearLayout>

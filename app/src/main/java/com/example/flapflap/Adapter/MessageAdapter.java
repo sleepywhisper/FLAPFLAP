@@ -1,5 +1,6 @@
 package com.example.flapflap.Adapter;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.flapflap.PostDetailActivity;
 import com.example.flapflap.R;
 import com.example.flapflap.javabean.Notification;
 
@@ -33,6 +35,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         Notification notification = notificationList.get(position);
         holder.textMessage.setText(notification.getMessage());
         holder.textTime.setText(notification.getNtime());
+
+        holder.itemView.setOnClickListener(view -> {
+            // 点击事件处理
+            int postId = notification.getPostId();
+            // 跳转到帖子详情页面
+            Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
+            intent.putExtra("POST_ID", postId);
+            view.getContext().startActivity(intent);
+        });
     }
 
     @Override

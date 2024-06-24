@@ -18,7 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.flapflap.PostDetailActivity;
 import com.example.flapflap.R;
+import com.example.flapflap.UserDetails;
 import com.example.flapflap.javabean.Post;
+import com.example.flapflap.myDetails;
+import com.example.flapflap.utils.UserSessionManager;
 
 import java.util.List;
 
@@ -81,6 +84,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.likesCountTextView.setText(String.valueOf(post.getLikes()));
         holder.commentsCountTextView.setText(String.valueOf(post.getCommentCount()));
 
+        holder.userAvatarImageView.setOnClickListener(view -> {
+            // 点击事件处理
+            int userId = post.getPoster();
+            UserSessionManager session = new UserSessionManager(context.getApplicationContext());
+            // 跳转到帖子详情页面
+            if(userId == Integer.parseInt(session.getUserId())){
+                Intent intent = new Intent(view.getContext(), myDetails.class);
+                view.getContext().startActivity(intent);
+            } else {
+                Intent intent = new Intent(view.getContext(), UserDetails.class);
+                intent.putExtra("USER_ID", userId);
+                view.getContext().startActivity(intent);
+            }
+
+        });
         holder.itemView.setOnClickListener(view -> {
             // 点击事件处理
             int communityId = post.getCommunityId();

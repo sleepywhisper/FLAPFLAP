@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.example.flapflap.javabean.User;
 import com.example.flapflap.retrofit.ApiService;
 import com.example.flapflap.retrofit.Constant;
+import com.example.flapflap.utils.UserSessionManager;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.activity.EdgeToEdge;
@@ -46,14 +47,15 @@ public class myDetails extends AppCompatActivity implements View.OnClickListener
     private ApiService apiService;
     private Integer userId;
     private ImageButton backButton;
+    private UserSessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_my_details);
-        Intent intent = getIntent();
-        userId = intent.getIntExtra("key_int", 0);
+        session = new UserSessionManager(getApplicationContext());
+        int userId = Integer.parseInt(session.getUserId());
         find();
         menu();
 
@@ -200,7 +202,7 @@ public class myDetails extends AppCompatActivity implements View.OnClickListener
             startActivity(intent);
         }else if(id == R.id.mysub){
             Intent intent = new Intent(this, PostActivity.class);
-            intent.putExtra("key_int", userId);
+            intent.putExtra("USER_ID", userId);
             startActivity(intent);
         }
     }

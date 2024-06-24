@@ -55,6 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:textColor="@color/black"
             android:text="账号："
             android:layout_marginLeft="10dp">
         </TextView>
@@ -64,7 +65,8 @@
             android:layout_height="50dp"
             android:ems="10"
             android:inputType="text"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@."/>
     </LinearLayout>
 
 
@@ -80,6 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="密码："
+            android:textColor="@color/black"
             android:layout_marginLeft="10dp"
             >
         </TextView>
@@ -91,15 +94,26 @@
             android:inputType="textPassword"
             android:layout_marginLeft="10dp"/>
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="40dp"/>
+<!--    <RadioGroup-->
+<!--        android:id="@+id/radio_selected_group"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="end"-->
+<!--        android:layout_marginRight="52dp"-->
+<!--        android:layout_marginBottom="17dp"-->
+<!--        android:layout_marginTop="10dp">-->
+<!--    <RadioButton-->
+<!--        android:id="@+id/radioButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="记住密码" />-->
+<!--    </RadioGroup>-->
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:layout_marginTop="45dp">
 
         <Button
             android:layout_width="wrap_content"
@@ -107,7 +121,7 @@
             android:text="登录"
             android:id="@+id/login"
             android:textColor="@color/white"
-            android:background="@color/green">
+            android:background="@drawable/btn_normal">
         </Button>
         <View
             android:layout_width="10dp"
@@ -118,10 +132,11 @@
             android:text="注册"
             android:id="@+id/register"
             android:textColor="@color/white"
-            android:background="@color/green">
+            android:background="@drawable/btn_normal">
         </Button>
 
     </LinearLayout>
+
 
 
 </LinearLayout>

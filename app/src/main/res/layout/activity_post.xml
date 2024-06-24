@@ -30,9 +30,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="编辑"
+            android:textColor="@color/black"
             android:textSize="18sp" />
 
         <TextView
+            android:id="@+id/community_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -45,15 +47,31 @@
             android:id="@+id/btn_publish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="发布" />
+            android:text="发布"
+            android:background="@drawable/btn_normal"
+            android:textColor="@color/white"/>
 
     </LinearLayout>
 
     <EditText
-        android:id="@+id/edit_text_post"
+        android:id="@+id/edit_text_title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:layout_margin="10sp"
+        android:hint="请输入标题"
+        android:gravity="top|left" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_image">
+    </ImageView>
+    <EditText
+        android:id="@+id/edit_text_post"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
         android:layout_margin="10sp"
         android:hint="请在此输入帖子内容…"
         android:gravity="top|left" />

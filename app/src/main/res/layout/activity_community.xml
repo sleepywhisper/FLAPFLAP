@@ -22,7 +22,6 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/tool_bar"
-        android:layout_marginTop="-17dp"
         android:gravity="center_vertical" >
 
         <ImageButton
@@ -35,27 +34,22 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Back"
             android:src="@android:drawable/ic_menu_revert" />
-
         <TextView
-            android:id="@+id/title"
-            android:layout_width="221dp"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_weight="1"
-            android:padding="10sp"
-            android:text="社区"
-            android:textColor="@android:color/black"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/switch_btn"
             android:layout_width="wrap_content"
-            android:layout_height="86dp"
-            android:layout_gravity="end"
-            android:padding="24sp"
-            android:text="切换社区"
-            android:textColor="#999999"
-            android:textSize="15sp" />
+            android:layout_height="wrap_content"
+            android:text="社"
+            android:textSize="35dp"
+            android:textColor="@color/green"
+            android:textStyle="bold"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="区"
+            android:textSize="35dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"/>
+
+
     </LinearLayout>
 
     <LinearLayout
@@ -63,12 +57,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/top_bar"
-        android:padding="16dp">
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/community_icon"
-            android:layout_width="60dp"
-            android:layout_height="60dp"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="7dp"
+            android:clickable="true"/>
         <!--android:src="@drawable/ic_community_icon" -->
 
 
@@ -76,24 +72,25 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_vertical"
+            android:layout_gravity="center"
             android:orientation="vertical"
             android:paddingStart="16dp">
-
+            <TextView
+                android:id="@+id/switch_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="切换社区>>"
+                android:textColor="#999999"
+                android:textSize="15sp" />
             <TextView
                 android:id="@+id/community_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="社区名称"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/community_post_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="发帖数：1000"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="14sp" />
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:layout_marginBottom="30dp"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -104,7 +101,9 @@
         android:layout_height="575dp"
         android:layout_below="@id/community_info"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@drawable/edge"
+        android:layout_margin="7dp">
 
         <!-- 导航栏 -->
 <!--        <LinearLayout-->
@@ -130,39 +129,12 @@
 <!--        </LinearLayout>-->
         <!-- 帖子列表，可以使用 RecyclerView 或其他适合的布局 -->
 
-        <LinearLayout
-            android:id="@+id/navigation_bar"
-            android:layout_width="380dp"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
-            <Button
-                android:id="@+id/btn_all"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="全部" />
-
-            <Button
-                android:id="@+id/btn_latest_posts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="最新发帖" />
-
-            <Button
-                android:id="@+id/btn_latest_comments"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="最新评论" />
-
-        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/post_list"
-            android:layout_width="373dp"
-            android:layout_height="443dp"
-            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             tools:listitem="@layout/item_post"/>
 
     </LinearLayout>

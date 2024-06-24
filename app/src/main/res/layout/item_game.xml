@@ -47,7 +47,7 @@
         android:layout_height="47dp"
         android:padding="8dp"
         android:textColor="@color/white"
-        android:background="@color/green"
+        android:background="@drawable/btn_normal"
         android:text="下载"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"

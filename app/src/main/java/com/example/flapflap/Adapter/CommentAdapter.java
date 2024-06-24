@@ -1,6 +1,10 @@
 package com.example.flapflap.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.flapflap.R;
+import com.example.flapflap.UserDetails;
 import com.example.flapflap.javabean.Comment;
 import com.example.flapflap.javabean.User;
 import com.example.flapflap.retrofit.Constant;
@@ -59,9 +64,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.likesTextView.setText(String.valueOf(comment.getLikes()));
         holder.replyCountTextView.setText(String.valueOf(comment.getReplies().size()));
 
+        byte[] decodedString = Base64.decode(user.getAvatar(), Base64.NO_WRAP);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         // 加载用户头像
         Glide.with(context)
-                .load(user.getAvatar())
+                .load(bitmap)
                 .placeholder(R.drawable.insert_picture_icon)
                 .error(R.drawable.insert_picture_icon)
                 .circleCrop()
@@ -72,6 +79,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.repliesRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         holder.repliesRecyclerView.setAdapter(replyAdapter);
 
+        holder.avatarImageView.setOnClickListener(v -> {
+            int userId = comment.getCommenter(); // 示例值
+
+            Intent intent = new Intent(v.getContext(), UserDetails.class);
+            intent.putExtra("USER_ID", userId);
+            v.getContext().startActivity(intent);
+        });
         holder.likeCommentButton.setOnClickListener(v -> {
             int postId = comment.getPostId(); // 示例值
             int commenter = comment.getCommenter(); // 示例值

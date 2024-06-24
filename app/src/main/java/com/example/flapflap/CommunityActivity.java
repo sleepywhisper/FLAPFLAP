@@ -8,13 +8,16 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -60,9 +63,6 @@ public class CommunityActivity extends AppCompatActivity {
         setContentView(R.layout.activity_community);
 
         backButton = findViewById(R.id.back_button);
-        btnAll = findViewById(R.id.btn_all);
-        btnLatestPosts = findViewById(R.id.btn_latest_posts);
-        btnLatestComments = findViewById(R.id.btn_latest_comments);
         communityNameTextView = findViewById(R.id.community_name);
         communityIconImageView = findViewById(R.id.community_icon);
         fabCreatePost = findViewById(R.id.fab_create_post);
@@ -73,14 +73,7 @@ public class CommunityActivity extends AppCompatActivity {
         postAdapter = new PostAdapter(this, postList);
         recyclerView.setAdapter(postAdapter);
 
-        if (backButton != null) {
-            backButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish(); // 返回上一页
-                }
-            });
-        }
+        menu();
 
         TextView switchButton = findViewById(R.id.switch_btn);
         switchButton.setOnClickListener(new View.OnClickListener() {
@@ -108,34 +101,11 @@ public class CommunityActivity extends AppCompatActivity {
                 // 跳转到发布帖子编辑页面
                 Intent intent = new Intent(CommunityActivity.this, CreatePostActivity.class);
                 intent.putExtra("COMMUNITY_ID", communityId);
+                intent.putExtra("COMMUNITY_NAME",communityNameTextView.getText().toString());
                 startActivity(intent);
             }
         });
 
-        // 示例：点击事件示例
-        btnAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(CommunityActivity.this, "显示全部帖子", Toast.LENGTH_SHORT).show();
-                // 更新帖子列表显示全部帖子
-            }
-        });
-
-        btnLatestPosts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(CommunityActivity.this, "显示最新发帖", Toast.LENGTH_SHORT).show();
-                // 更新帖子列表显示最新发帖
-            }
-        });
-
-        btnLatestComments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(CommunityActivity.this, "显示最新评论", Toast.LENGTH_SHORT).show();
-                // 更新帖子列表显示最新评论
-            }
-        });
 
         // 获取从上一个活动传递过来的社区 ID
         int communityId = getIntent().getIntExtra("COMMUNITY_ID", -1);
@@ -143,6 +113,15 @@ public class CommunityActivity extends AppCompatActivity {
             fetchCommunityInfo(communityId);
             fetchPostList(communityId);
         }
+
+        communityIconImageView.setOnClickListener(view -> {
+            // 跳转到游戏详情页面
+            Intent intent = new Intent(view.getContext(), GameDetails.class);
+            intent.putExtra("gameId", communityId);
+            view.getContext().startActivity(intent);
+        });
+
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
     }
 
     private void fetchCommunityInfo(int communityId) {
@@ -179,7 +158,7 @@ public class CommunityActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                communityNameTextView.setText(gameName);
+                                communityNameTextView.setText(gameName+"社区");
                                 byte[] decodedString = Base64.decode(iconUrl, Base64.NO_WRAP);
                                 Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                                 Glide.with(CommunityActivity.this)
@@ -206,14 +185,22 @@ public class CommunityActivity extends AppCompatActivity {
         OkHttpClient client = new OkHttpClient();
 
         // 构建请求URL
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(Constant.BASE_URL + "/server/post/searchByCommunity").newBuilder();
-        urlBuilder.addQueryParameter("id", String.valueOf(communityId)); // 传递社区ID作为查询参数
-        String url = urlBuilder.build().toString();
+//        HttpUrl.Builder urlBuilder = HttpUrl.parse(Constant.BASE_URL + "/server/post/searchByCommunity").newBuilder();
+//        urlBuilder.addQueryParameter("id", String.valueOf(communityId)); // 传递社区ID作为查询参数
+//        String url = urlBuilder.build().toString();
 
-        // 构建请求
-        Request request = new Request.Builder()
-                .url(url)
+        RequestBody formBody = new FormBody.Builder()
+                .add("id", String.valueOf(communityId))
                 .build();
+
+        Request request = new Request.Builder()
+                .url(Constant.BASE_URL + "/server/post/searchByCommunity")
+                .post(formBody)
+                .build();
+        // 构建请求
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .build();
 
         // 发起异步请求
         client.newCall(request).enqueue(new Callback() {
@@ -253,6 +240,59 @@ public class CommunityActivity extends AppCompatActivity {
         Gson gson = new Gson();
         Type postListType = new TypeToken<List<Post>>(){}.getType();
         return gson.fromJson(responseBody, postListType);
+    }
+
+    private void menu() {
+        backButton = findViewById(R.id.back_button);
+
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> {
+                finish(); // 返回上一页
+            });
+        }
+        ImageButton searchButton = findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 跳转到搜索页面
+                Intent intent = new Intent(CommunityActivity.this, SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        ImageButton menuButton = findViewById(R.id.menu_button);
+        menuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 弹出菜单
+                PopupMenu popupMenu = new PopupMenu(CommunityActivity.this, menuButton);
+                popupMenu.getMenuInflater().inflate(R.menu.nav_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int itemId = item.getItemId();
+                        if (itemId == R.id.navigation_find) {
+                            // 跳转到发现页面
+                            Intent intent = new Intent(CommunityActivity.this, DiscoverActivity.class);
+                            startActivity(intent);
+                            return true;
+                        } else if (itemId == R.id.navigation_community) {
+                            // 跳转到社区页面
+                            Intent intent = new Intent(CommunityActivity.this, AllCommunityActivity.class);
+                            startActivity(intent);
+                            return true;
+                        } else if (itemId == R.id.navigation_me) {
+                            // 跳转到我的页面
+                            Intent intent = new Intent(CommunityActivity.this, MeActivity.class);
+                            startActivity(intent);
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.show();
+            }
+        });
     }
 }
 

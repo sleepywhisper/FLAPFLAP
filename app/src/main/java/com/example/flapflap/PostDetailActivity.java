@@ -1,5 +1,7 @@
 package com.example.flapflap;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,15 +18,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.flapflap.Adapter.CommentAdapter;
 import com.example.flapflap.javabean.Comment;
-import com.example.flapflap.javabean.Reply;
+import com.example.flapflap.javabean.Post;
+import com.example.flapflap.javabean.Incomment;
 import com.example.flapflap.javabean.User;
-import com.example.flapflap.retrofit.ApiService;
 import com.example.flapflap.retrofit.Constant;
+import com.example.flapflap.utils.UserSessionManager;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -32,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,8 +51,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PostDetailActivity extends AppCompatActivity {
     private int communityId;
@@ -56,20 +62,15 @@ public class PostDetailActivity extends AppCompatActivity {
     private List<Comment> commentList = new ArrayList<>();
     private TextView likesTextView;
 
-    private ImageButton backButton;
-    private TextView titleTextView;
-    private ImageView userAvatarImageView;
-    private TextView usernameTextView, postTimeTextView, postTitleTextView, postContentTextView;
-    private ImageView postImageView;
-    private ImageView likeButton, commentButton, reply_likeButton;
-    private TextView likeCountTextView, commentCountTextView, reply_likeCount;
     private RecyclerView recyclerViewComments;
     private EditText commentEditText;
     private Button sendCommentButton;
-    private Integer commenterId;
-    private Retrofit retrofit;
-    private ApiService apiService;
-    private MYsqliteopenhelper mYsqliteopenhelper;
+    private ImageButton delete;
+    UserSessionManager session;
+    Integer userId,poster;
+
+    public PostDetailActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,22 +80,13 @@ public class PostDetailActivity extends AppCompatActivity {
         // 获取传递的社区ID和帖子ID
         communityId = getIntent().getIntExtra("COMMUNITY_ID", -1);
         postId = getIntent().getIntExtra("POST_ID", -1);
-
-        //获取用户ID
-        retrofit = new Retrofit.Builder()
-                .baseUrl(Constant.BASE_URL) // 替换为你的后端地址
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(new OkHttpClient())
-                .build();
-
-        apiService = retrofit.create(ApiService.class);
-        mYsqliteopenhelper = new MYsqliteopenhelper(this);
-        String name = mYsqliteopenhelper.getName();
-        fetchUserIdAndInfo(name);
-
+        session = new UserSessionManager(getApplicationContext());
+        userId = Integer.parseInt(session.getUserId());
+        delete = findViewById(R.id.delete);
         getPostDetail(postId, communityId);
 
         // 设置返回按钮的点击事件
+        ImageView backButton = findViewById(R.id.btn_back);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,6 +102,29 @@ public class PostDetailActivity extends AppCompatActivity {
                 Intent intent = new Intent(PostDetailActivity.this, SearchActivity.class);
                 startActivity(intent);
             }
+        });
+
+
+        delete.setOnClickListener(view -> {
+            final AlertDialog.Builder normalDialog =
+                    new AlertDialog.Builder(PostDetailActivity.this);
+            normalDialog.setMessage("确定要删除帖子吗?");
+            normalDialog.setPositiveButton("确定",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deletePost(postId);
+                        }
+                    });
+            normalDialog.setNegativeButton("取消",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //...To-do
+                        }
+                    });
+            // 显示
+            normalDialog.show();
         });
 
         likesTextView = findViewById(R.id.like_count);
@@ -128,6 +143,8 @@ public class PostDetailActivity extends AppCompatActivity {
         // 示例：设置评论按钮的点击事件
         commentEditText = findViewById(R.id.comment_edit_text);
         sendCommentButton = findViewById(R.id.send_comment_button);
+
+        ImageView commentButton = findViewById(R.id.btn_comment);
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,7 +152,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 commentEditText.requestFocus();
                 String commentContent = commentEditText.getText().toString().trim();
                 if (!commentContent.isEmpty()) {
-                    addComment(postId, commenterId, commentContent); // 假设评论者的ID是1
+                    addComment(postId, userId, commentContent); // 假设评论者的ID是1
                 }
             }
         });
@@ -156,16 +173,56 @@ public class PostDetailActivity extends AppCompatActivity {
         commentsAdapter = new CommentAdapter(commentList, this);
         recyclerViewComments.setAdapter(commentsAdapter);
         recyclerViewComments.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewComments.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
 
         loadComments(postId);
     }
 
-    private void getPostDetail(int postId, int communityId) {
-        String url = Constant.BASE_URL +  "/server/post/postInfo?id=" + postId;
+    private void deletePost(int postId) {
+        String url = Constant.BASE_URL + "/server/post/deletePost";
 
         // 构建请求体
         RequestBody requestBody = new FormBody.Builder()
-                .add("id", String.valueOf(communityId)) // 添加社区ID到FormData
+                .add("id", String.valueOf(postId)) // 添加社区ID到FormData
+                .build();
+
+        // 创建请求
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .build();
+
+        OkHttpClient client = new OkHttpClient();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                // 处理错误
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseData = response.body().string();
+                String res = "\"" + responseData + "\"";
+                Log.e("rita", "resData: " + res);
+                if ("\"true\"".equals(res)) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(PostDetailActivity.this, "删除成功！", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                } else {
+                    runOnUiThread(() -> Toast.makeText(PostDetailActivity.this, "删除失败！", Toast.LENGTH_SHORT).show());
+                }
+            }
+        });
+    }
+
+    private void getPostDetail(int postId, int communityId) {
+        String url = Constant.BASE_URL + "/server/post/postInfo";
+
+        // 构建请求体
+        RequestBody requestBody = new FormBody.Builder()
+                .add("id", String.valueOf(postId)) // 添加社区ID到FormData
                 .build();
 
         // 创建请求
@@ -189,25 +246,26 @@ public class PostDetailActivity extends AppCompatActivity {
                     String responseData = response.body().string();
                     runOnUiThread(() -> {
                         // 解析并显示数据
-                        try {
-                            JSONObject jsonObject = new JSONObject(responseData);
-                            displayPostDetail(jsonObject);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        Gson gson = new GsonBuilder().create();
+                        Post post = gson.fromJson(responseData, Post.class);
+                        displayPostDetail(post);
                     });
                 }
             }
         });
     }
 
-
     private void loadComments(int postId) {
-        String url = Constant.BASE_URL + "/server/comment/searchByPost?id=" + postId;
+        String url = Constant.BASE_URL + "/server/comment/searchByPost";
         OkHttpClient client = new OkHttpClient();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("id", String.valueOf(postId))
+                .build();
 
         Request request = new Request.Builder()
                 .url(url)
+                .post(formBody)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -220,58 +278,56 @@ public class PostDetailActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
-                    try {
-                        JSONArray jsonArray = new JSONArray(responseData);
-                        commentList.clear();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    Gson gson = new GsonBuilder().create();
+                    Type commentListType = new TypeToken<List<Comment>>() {}.getType();
+                    List<Comment> comments = gson.fromJson(responseData, commentListType);
+                    commentList.clear();
+                    for (int i = 0; i < comments.size(); i++) {
+//                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+//
+//                            // 解析 user 对象
+//                            JSONObject userObject = jsonObject.getJSONObject("user");
+//                            User user = new User();
+//                            user.setAvatar(userObject.getString("avatar"));
+//                            user.setNickname(userObject.getString("nickname"));
+//
+//                            Comment comment = new Comment();
+//                            comment.setUser(user);
+//                            comment.setCommenter(jsonObject.getInt("commenter"));
+//                            comment.setPostId(jsonObject.getInt("postId"));
+//                            comment.setTimestamp(jsonObject.getString("ctime"));
+//                            comment.setContent(jsonObject.getString("content"));
+//                            comment.setLikes(jsonObject.getInt("likes"));
+//
+//                            JSONArray repliesArray = jsonObject.getJSONArray("incomments");
+//                            List<Incomment> replies = new ArrayList<>();
+//                            for (int j = 0; j < repliesArray.length(); j++) {
+//                                JSONObject replyObject = repliesArray.getJSONObject(j);
+//
+//                                // 解析 user 对象
+//                                JSONObject replyUserObject = replyObject.getJSONObject("user");
+//                                User replyUser = new User();
+//                                replyUser.setAvatar(replyUserObject.getString("avatar"));
+//                                replyUser.setNickname(replyUserObject.getString("nickname"));
+//
+//                                Incomment reply = new Incomment();
+//                                reply.setUser(replyUser);
+//                                reply.setTimestamp(replyObject.getString("ctime"));
+//                                reply.setContent(replyObject.getString("content"));
+//                                reply.setLikes(replyObject.getInt("likes"));
+//                                replies.add(reply);
+//                            }
+//                            comment.setReplies(replies);
 
-                            // 解析 user 对象
-                            JSONObject userObject = jsonObject.getJSONObject("user");
-                            User user = new User();
-                            user.setAvatar(userObject.getString("avatar"));
-                            user.setNickname(userObject.getString("nickname"));
-
-                            Comment comment = new Comment();
-                            comment.setUser(user);
-                            comment.setCommenter(jsonObject.getInt("commenter"));
-                            comment.setPostId(jsonObject.getInt("postId"));
-                            comment.setTimestamp(jsonObject.getString("ctime"));
-                            comment.setContent(jsonObject.getString("content"));
-                            comment.setLikes(jsonObject.getInt("likes"));
-
-                            JSONArray repliesArray = jsonObject.getJSONArray("incomments");
-                            List<Reply> replies = new ArrayList<>();
-                            for (int j = 0; j < repliesArray.length(); j++) {
-                                JSONObject replyObject = repliesArray.getJSONObject(j);
-
-                                // 解析 user 对象
-                                JSONObject replyUserObject = replyObject.getJSONObject("user");
-                                User replyUser = new User();
-                                replyUser.setAvatar(replyUserObject.getString("avatar"));
-                                replyUser.setNickname(replyUserObject.getString("nickname"));
-
-                                Reply reply = new Reply();
-                                reply.setUser(replyUser);
-                                reply.setTimestamp(replyObject.getString("ctime"));
-                                reply.setContent(replyObject.getString("content"));
-                                reply.setLikes(replyObject.getInt("likes"));
-                                replies.add(reply);
-                            }
-                            comment.setReplies(replies);
-
-                            commentList.add(comment);
-                        }
-                        runOnUiThread(() -> commentsAdapter.notifyDataSetChanged());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        commentList.add(comments.get(i));
                     }
+                    runOnUiThread(() -> commentsAdapter.notifyDataSetChanged());
                 }
             }
         });
     }
 
-    private void displayPostDetail(JSONObject postDetail) {
+    private void displayPostDetail(Post post) {
         // 解析 JSON 并显示数据
         ImageView userAvatarImageView = findViewById(R.id.user_avatar);
         TextView usernameTextView = findViewById(R.id.username);
@@ -282,32 +338,37 @@ public class PostDetailActivity extends AppCompatActivity {
         TextView commentCountTextView = findViewById(R.id.comment_count);
         LinearLayout imagesContainer = findViewById(R.id.imagesContainer);
 
-        try {
-            String userAvatarBase64 = postDetail.getString("userAvatar");
-            String username = postDetail.getString("username");
-            String postTime = postDetail.getString("postTime");
-            String title = postDetail.getString("title");
-            String content = postDetail.getString("content");
-            likes = postDetail.getInt("likes");
-            commentCount = postDetail.getInt("commentCount");
-            JSONArray imagesArray = postDetail.getJSONArray("images");
+        if(post.getPoster() == userId){
+            delete.setVisibility(View.VISIBLE);
+        }else{
+            delete.setVisibility(View.GONE);
+        }
+        String userAvatarBase64 = post.getUser().getAvatar();
+        String username = post.getUser().getNickname();
+        String postTime = post.getPtime();
+        String title = post.getTitle();
+        String content = post.getContent();
+        likes = post.getLikes();
+        commentCount = post.getCommentCount();
+        String[] imagesArray = post.getImageUrls();
 
-            // Decode Base64 avatar
-            byte[] decodedString = Base64.decode(userAvatarBase64, Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            userAvatarImageView.setImageBitmap(decodedByte);
+        // Decode Base64 avatar
+        byte[] decodedString = Base64.decode(userAvatarBase64, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        userAvatarImageView.setImageBitmap(decodedByte);
 
-            usernameTextView.setText(username);
-            postTimeTextView.setText(postTime);
-            titleTextView.setText(title);
-            contentTextView.setText(content);
-            likesTextView.setText(String.valueOf(likes));
-            commentCountTextView.setText(String.valueOf(commentCount));
+        usernameTextView.setText(username);
+        postTimeTextView.setText(postTime);
+        titleTextView.setText(title);
+        contentTextView.setText(content);
+        likesTextView.setText(String.valueOf(likes));
+        commentCountTextView.setText(String.valueOf(commentCount));
 
-            // Load images
+        // Load images
+        if(imagesArray != null){
             imagesContainer.removeAllViews();
-            for (int i = 0; i < imagesArray.length(); i++) {
-                String imageUrl = imagesArray.getString(i);
+            for (int i = 0; i < imagesArray.length; i++) {
+                String imageUrl = imagesArray[i];
                 ImageView imageView = new ImageView(this);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -317,10 +378,9 @@ public class PostDetailActivity extends AppCompatActivity {
                 Picasso.get().load(imageUrl).into(imageView);
                 imagesContainer.addView(imageView);
             }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
+
+
     }
 
     private void likePost(int postId) {
@@ -367,7 +427,7 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void addComment(int postId, int commenterId, String content) {
-        String url = Constant.BASE_URL + "/server/comment/addComment";
+        String url = Constant.BASE_URL+ "/server/comment/addComment";
 
         // 构建JSON请求体
         JSONObject json = new JSONObject();
@@ -409,25 +469,6 @@ public class PostDetailActivity extends AppCompatActivity {
                         }
                     });
                 }
-            }
-        });
-    }
-
-    private void fetchUserIdAndInfo(String name) {
-        retrofit2.Call<Integer> getUserCall = apiService.getUser(name);
-        getUserCall.enqueue(new retrofit2.Callback<Integer>() {
-            @Override
-            public void onResponse(retrofit2.Call<Integer> call, retrofit2.Response<Integer> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    commenterId = response.body();
-                } else {
-                    Log.e("Error", "Failed to get user ID");
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<Integer> call, Throwable t) {
-                Log.e("Error", "Network request failed", t);
             }
         });
     }

@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -17,8 +19,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.flapflap.javabean.LoginUser;
 import com.example.flapflap.javabean.User;
+import com.example.flapflap.retrofit.ApiService;
 import com.example.flapflap.retrofit.Constant;
 import com.example.flapflap.utils.MD5;
+import com.example.flapflap.utils.UserSessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +37,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,14 +46,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText name,password;
     private LoginUser loginUser;
     private MYsqliteopenhelper mYsqliteopenhelper;
+    UserSessionManager session;
+    private ApiService apiService;
+    private Retrofit retrofit;
+    private int userId = -1;
+//    private RadioButton remember;
+//    private RadioGroup radioGroup;
+//    private boolean isChecked;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.login);
-        mYsqliteopenhelper = new MYsqliteopenhelper(this);
+        retrofit = new Retrofit.Builder()
+                .baseUrl(Constant.BASE_URL) // 替换为你的后端地址
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(new OkHttpClient())
+                .build();
+
+        apiService = retrofit.create(ApiService.class);
+        session = new UserSessionManager(getApplicationContext());
         find();
 
+        if (session.isLoggedIn()) {
+            // 用户已经登录，跳转到主页面
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        String myname = session.getUsername();
+        if(myname != null) name.setText(myname);
+
+//        remember.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (isChecked == true) {
+//                    remember.setChecked(false);
+//                    isChecked = false;
+//                } else {
+//                    isChecked = true;
+//                    remember.setChecked(true);
+//                }
+//            }
+//        });
         login.setOnClickListener(this);
         register.setOnClickListener(this);
     }
@@ -57,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         register = findViewById(R.id.register);
         name = findViewById(R.id.name);
         password = findViewById(R.id.password);
+//        radioGroup = findViewById(R.id.radio_selected_group);
+//        remember = findViewById(R.id.radioButton);
     }
 
     @Override
@@ -206,7 +250,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
 }
 
+    private void fetchUserIdAndInfo(String name) {
+        retrofit2.Call<Integer> getUserCall = apiService.getUser(name);
+        getUserCall.enqueue(new retrofit2.Callback<Integer>() {
+            @Override
+            public void onResponse(retrofit2.Call<Integer> call, retrofit2.Response<Integer> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    userId = response.body();
+                    Log.d("User ID", "User ID: " + userId);
+                    session.createLoginSession(name, String.valueOf(userId));
+                } else {
+                    Log.e("Error", "Failed to get user ID");
+                }
+            }
 
+            @Override
+            public void onFailure(retrofit2.Call<Integer> call, Throwable t) {
+                Log.e("Error", "Network request failed", t);
+            }
+        });
+    }
 private void loginResponse(String jsondata) {
     if (jsondata != null) {
         try {
@@ -219,7 +282,9 @@ private void loginResponse(String jsondata) {
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
-                    mYsqliteopenhelper.register(name.getText().toString(),password.getText().toString());
+                    fetchUserIdAndInfo(name.getText().toString());
+                    Log.d("User ID2", "User ID2: " + userId);
+
                 });
             } else if(data.equals("失败")){
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "用户名或密码不正确", Toast.LENGTH_SHORT).show());
@@ -244,7 +309,7 @@ private void registerResponse(String jsondata) {
                         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                         startActivity(intent);
                         finish();
-                        mYsqliteopenhelper.register(name.getText().toString(),password.getText().toString());
+                        fetchUserIdAndInfo(name.getText().toString());
                     }
                 });
             } else {

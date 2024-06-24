@@ -21,6 +21,7 @@ import com.example.flapflap.javabean.Post;
 import com.example.flapflap.javabean.Post;
 import com.example.flapflap.retrofit.ApiService;
 import com.example.flapflap.retrofit.Constant;
+import com.example.flapflap.utils.UserSessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +42,14 @@ public class PostActivity extends AppCompatActivity {
     private PostAdapter adapter;
     List<Post> postList = new ArrayList<>();
     private ImageButton backButton;
+    private UserSessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.post);
-        Intent intent = getIntent();
-        int userId = intent.getIntExtra("key_int", 0);
-
+        int userId = getIntent().getIntExtra("USER_ID", -1);
+        Log.d("rita", "onCreate: " + userId);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 

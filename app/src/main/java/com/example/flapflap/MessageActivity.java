@@ -13,6 +13,7 @@ import android.widget.PopupMenu;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.flapflap.Adapter.MessageAdapter;
@@ -20,6 +21,7 @@ import com.example.flapflap.javabean.Notification;
 import com.example.flapflap.javabean.User;
 import com.example.flapflap.retrofit.ApiService;
 import com.example.flapflap.retrofit.Constant;
+import com.example.flapflap.utils.UserSessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,19 +40,21 @@ public class MessageActivity extends AppCompatActivity {
     List<Notification> notificationList = new ArrayList<>();
     private Retrofit retrofit;
     private ImageButton backButton;
+    private UserSessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.message);
 
-        Intent intent = getIntent();
-        int userId = intent.getIntExtra("key_int", 0);
+        session = new UserSessionManager(getApplicationContext());
+        int userId = Integer.parseInt(session.getUserId());
 
         menu();
 
         recyclerView = findViewById(R.id.recycler_view_messages);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

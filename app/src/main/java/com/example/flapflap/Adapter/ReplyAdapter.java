@@ -1,6 +1,10 @@
 package com.example.flapflap.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.flapflap.R;
-import com.example.flapflap.javabean.Reply;
+import com.example.flapflap.UserDetails;
+import com.example.flapflap.javabean.Incomment;
 import com.example.flapflap.javabean.User;
 
 import java.util.List;
 
 public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHolder> {
-    private List<Reply> replyList;
+    private List<Incomment> replyList;
     private Context context;
 
-    public ReplyAdapter(List<Reply> replyList, Context context) {
+    public ReplyAdapter(List<Incomment> replyList, Context context) {
         this.replyList = replyList;
         this.context = context;
     }
@@ -35,21 +40,31 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
 
     @Override
     public void onBindViewHolder(@NonNull ReplyViewHolder holder, int position) {
-        Reply reply = replyList.get(position);
+        Incomment reply = replyList.get(position);
         User user = reply.getUser();
 
         holder.replyUsernameTextView.setText(user.getNickname());
-        holder.replyTimestampTextView.setText(reply.getTimestamp());
+        holder.replyTimestampTextView.setText(reply.getCtime());
         holder.replyContentTextView.setText(reply.getContent());
         holder.replyLikesTextView.setText(String.valueOf(reply.getLikes()));
 
+        byte[] decodedString = Base64.decode(user.getAvatar(), Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         // 加载用户头像
         Glide.with(context)
-                .load(user.getAvatar())
+                .load(decodedByte)
                 .placeholder(R.drawable.insert_picture_icon)
                 .error(R.drawable.insert_picture_icon)
                 .circleCrop()
                 .into(holder.replyAvatarImageView);
+
+        holder.replyAvatarImageView.setOnClickListener(v -> {
+            int userId = reply.getCommenter(); // 示例值
+
+            Intent intent = new Intent(v.getContext(), UserDetails.class);
+            intent.putExtra("USER_ID", userId);
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override

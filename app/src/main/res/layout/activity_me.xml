@@ -131,12 +131,7 @@
             android:background="@color/white"
             android:layout_margin="10dp">
 
-            <include
-                android:id="@+id/mygame"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                layout="@layout/setting_item"
-                android:clickable="true"/>
+
 
             <include
                 android:id="@+id/mydown"
@@ -162,6 +157,13 @@
                 android:layout_marginTop="20dp"
                 android:clickable="true"/>
 
+            <include
+                android:id="@+id/mygame"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                layout="@layout/setting_item"
+                android:layout_marginTop="20dp"
+                android:clickable="true"/>
         </LinearLayout>
 
 

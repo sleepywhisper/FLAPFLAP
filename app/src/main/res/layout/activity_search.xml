@@ -61,7 +61,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="Search"
-        android:background="@color/green"
+        android:background="@drawable/btn_black"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

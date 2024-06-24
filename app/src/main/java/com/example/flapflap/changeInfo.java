@@ -44,6 +44,7 @@ import com.example.flapflap.retrofit.ApiService;
 import com.example.flapflap.retrofit.Constant;
 import com.example.flapflap.utils.BitmapUtils;
 import com.example.flapflap.utils.CameraUtils;
+import com.example.flapflap.utils.UserSessionManager;
 import com.hb.dialog.myDialog.ActionSheetDialog;
 import com.hb.dialog.myDialog.MyAlertInputDialog;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -73,7 +74,7 @@ public class changeInfo extends AppCompatActivity implements View.OnClickListene
     private View snickname, sgender, sbirth, spassword,ssign,savatar;
     private TextView nickname, gender, birth, sign;
     private Retrofit retrofit;
-    private MYsqliteopenhelper mYsqliteopenhelper;
+    private UserSessionManager session;
     private ImageView avatar;
     private ApiService apiService;
     int yourChoice;
@@ -104,7 +105,7 @@ public class changeInfo extends AppCompatActivity implements View.OnClickListene
         savatar.setOnClickListener(this);
         spassword.setOnClickListener(this);
 
-        mYsqliteopenhelper = new MYsqliteopenhelper(this);
+        session = new UserSessionManager(getApplicationContext());
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(Constant.BASE_URL) // 替换为你的后端地址
@@ -115,13 +116,8 @@ public class changeInfo extends AppCompatActivity implements View.OnClickListene
         apiService = retrofit.create(ApiService.class);
 
         // 获取用户名
-        name = mYsqliteopenhelper.getName();
-        Log.d("rita", "onCreate: " + name);
-        if (name != null && !name.isEmpty()) {
-            fetchUserIdAndInfo(name);
-        } else {
-            Log.e("Error", "Username is null or empty");
-        }
+        Integer userId = Integer.valueOf(session.getUserId());
+        fetchUserInfo(userId);
     }
 
     private void menu() {
@@ -200,8 +196,7 @@ public class changeInfo extends AppCompatActivity implements View.OnClickListene
     @Override
     public void onClick(View view) {
         int id = view.getId();
-        mYsqliteopenhelper = new MYsqliteopenhelper(this);
-        String myname = mYsqliteopenhelper.getName();
+        String myname = session.getUsername();
         if(id == R.id.snickname){
             final EditText editText = new EditText(changeInfo.this);
             editText.setText(nickname.getText());
@@ -331,26 +326,6 @@ public class changeInfo extends AppCompatActivity implements View.OnClickListene
 
             @Override
             public void onFailure(Call<Boolean> call, Throwable t) {
-                Log.e("Error", "Network request failed", t);
-            }
-        });
-    }
-    private void fetchUserIdAndInfo(String name) {
-        Call<Integer> getUserCall = apiService.getUser(name);
-        getUserCall.enqueue(new Callback<Integer>() {
-            @Override
-            public void onResponse(Call<Integer> call, Response<Integer> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Integer userId = response.body();
-                    Log.d("User ID", "User ID: " + userId);
-                    fetchUserInfo(userId);
-                } else {
-                    Log.e("Error", "Failed to get user ID");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Integer> call, Throwable t) {
                 Log.e("Error", "Network request failed", t);
             }
         });
@@ -620,8 +595,7 @@ public class changeInfo extends AppCompatActivity implements View.OnClickListene
 
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mYsqliteopenhelper = new MYsqliteopenhelper(this);
-        String myname = mYsqliteopenhelper.getName();
+        String myname = session.getUsername();
 
         if(requestCode==100&&resultCode==RESULT_OK&&data!=null){//系统相册
             Uri imageData = data.getData();

@@ -30,6 +30,7 @@ import com.example.flapflap.javabean.User;
 import com.example.flapflap.retrofit.ApiService;
 import com.example.flapflap.retrofit.Constant;
 import com.example.flapflap.retrofit.GetUserRequest;
+import com.example.flapflap.utils.UserSessionManager;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -42,13 +43,13 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
     private ImageView avatar;
     private TextView nickname, id, sign;
     TextView mydetails;
-    private View mysub,myalarm;
+    private View mysub,myalarm,mygame;
     private Retrofit retrofit;
     private ApiService apiService;
-    private MYsqliteopenhelper mYsqliteopenhelper;
+    UserSessionManager session;
     private ImageButton backButton;
 
-    Integer userId = 0;
+    Integer userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +60,16 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
         // 初始化视图
         find();
         menu();
+        session = new UserSessionManager(getApplicationContext());
+        if (!session.isLoggedIn()) {
+            // 用户未登录，跳转到登录页面
+            Intent intent = new Intent(MeActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
-        setSettingItem(findViewById(R.id.mygame), getResources().getDrawable(R.drawable.game),"我的游戏");
+        //Toast.makeText(this,session.getUserId(),Toast.LENGTH_SHORT).show();
+        setSettingItem(mygame, getResources().getDrawable(R.drawable.logout),"退出登录");
         setSettingItem(findViewById(R.id.mydown), getResources().getDrawable(R.drawable.download),"下载管理");
         setSettingItem(mysub, getResources().getDrawable(R.drawable.launch),"我的发布");
         setSettingItem(myalarm, getResources().getDrawable(R.drawable.announce),"我的消息");
@@ -68,8 +77,8 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
         mysub.setOnClickListener(this);
         myalarm.setOnClickListener(this);
         mydetails.setOnClickListener(this);
+        mygame.setOnClickListener(this);
 
-        mYsqliteopenhelper = new MYsqliteopenhelper(this);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -86,13 +95,8 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
         apiService = retrofit.create(ApiService.class);
 
         // 获取用户名
-        String name = mYsqliteopenhelper.getName();
-        Log.d("rita", "onCreate: " + name);
-        if (name != null && !name.isEmpty()) {
-            fetchUserIdAndInfo(name);
-        } else {
-            Log.e("Error", "Username is null or empty");
-        }
+        userId = Integer.valueOf(session.getUserId());
+            fetchUserInfo(userId);
 
         nickname.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
     }
@@ -102,38 +106,19 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
         int id = v.getId();
         if(id == R.id.mydetails){
             Intent intent = new Intent(this, myDetails.class);
-            intent.putExtra("key_int",userId);
             startActivity(intent);
         }else if(id == R.id.mysub){
             Intent intent = new Intent(this, PostActivity.class);
-            intent.putExtra("key_int", userId);
+            intent.putExtra("USER_ID", userId);
             startActivity(intent);
         }else if(id == R.id.myalarm){
             Intent intent = new Intent(this, MessageActivity.class);
-            intent.putExtra("key_int", userId);
+            startActivity(intent);
+        }else if(id == R.id.mygame){
+            session.logoutUser();
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
-    }
-
-    private void fetchUserIdAndInfo(String name) {
-        Call<Integer> getUserCall = apiService.getUser(name);
-        getUserCall.enqueue(new Callback<Integer>() {
-            @Override
-            public void onResponse(Call<Integer> call, Response<Integer> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    userId = response.body();
-                    Log.d("User ID", "User ID: " + userId);
-                    fetchUserInfo(userId);
-                } else {
-                    Log.e("Error", "Failed to get user ID");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Integer> call, Throwable t) {
-                Log.e("Error", "Network request failed", t);
-            }
-        });
     }
 
     private void fetchUserInfo(Integer userId) {
@@ -182,6 +167,7 @@ public class MeActivity extends AppCompatActivity implements View.OnClickListene
         mydetails = findViewById(R.id.mydetails);
         mysub = findViewById(R.id.mysub);
         myalarm = findViewById(R.id.myalarm);
+        mygame =findViewById(R.id.mygame);
     }
 
     private void menu() {

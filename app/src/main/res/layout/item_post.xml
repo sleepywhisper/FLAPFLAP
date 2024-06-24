@@ -4,24 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="3dp">
 
         <ImageView
             android:id="@+id/userAvatarImageView"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:layout_marginEnd="16dp"
-            android:contentDescription="avatar" />
+            android:layout_marginLeft="16dp"
+            android:contentDescription="avatar"
+            android:clickable="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_gravity="center">
 
             <TextView
                 android:id="@+id/userNameTextView"
@@ -50,10 +54,11 @@
         android:id="@+id/postTitleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="16dp"
         android:text="Post Title"
-        android:textStyle="bold"
-        android:layout_marginTop="8dp"
-        android:textSize="18sp"/>
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/postContentTextView"
@@ -61,7 +66,7 @@
         android:layout_height="wrap_content"
         android:text="帖子内容"
         android:textSize="16sp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="7dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"/>
 
@@ -75,7 +80,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:gravity="end">
 
         <ImageView

@@ -134,4 +134,18 @@ public class MYsqliteopenhelper extends SQLiteOpenHelper {
         }
         return res;
     }
+
+    String getPassword(){
+        SQLiteDatabase db = getWritableDatabase();
+        String res = null;
+        Cursor users = db.query("users", null,
+                "id = ?", new String[]{"1"},null,null,null);
+
+        if(users!=null){
+            while(users.moveToNext()){
+                res = users.getString(2);
+            }
+        }
+        return res;
+    }
 }

@@ -11,9 +11,9 @@ public class Comment {
     private int likes;
     private int replyCount;
     private User user;
-    private List<Reply> replies;
+    private List<Incomment> incomments;
 
-    public Comment(String id, int commenter, int postId, String content, String timestamp, int likes, int replyCount, User user, List<Reply> replies) {
+    public Comment(String id, int commenter, int postId, String content, String timestamp, int likes, int replyCount, User user, List<Incomment> replies) {
         this.id = id;
         this.commenter = commenter;
         this.postId = postId;
@@ -22,7 +22,7 @@ public class Comment {
         this.likes = likes;
         this.replyCount = replyCount;
         this.user = user;
-        this.replies = replies;
+        this.incomments = replies;
     }
 
     public Comment() {
@@ -91,12 +91,12 @@ public class Comment {
         this.user = user;
     }
 
-    public List<Reply> getReplies() {
-        return replies;
+    public List<Incomment> getReplies() {
+        return incomments;
     }
 
-    public void setReplies(List<Reply> replies) {
-        this.replies = replies;
+    public void setReplies(List<Incomment> replies) {
+        this.incomments = replies;
     }
 }
 

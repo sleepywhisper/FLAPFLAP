@@ -1,5 +1,7 @@
 package com.example.flapflap.javabean;
 
+import okhttp3.RequestBody;
+
 public class Post {
     private int id;
     private int communityId;
